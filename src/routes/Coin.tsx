@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useQuery } from "react-query";
 import {
   Switch,
   Route,
@@ -8,6 +8,7 @@ import {
   useRouteMatch,
 } from "react-router-dom";
 import styled from "styled-components";
+import { fetchCoinInfo, fetchCoinTickers } from "./api";
 import Chart from "./Chart";
 import Price from "./Price";
 interface RouteParams {
@@ -140,13 +141,21 @@ interface PriceData {
 }
 
 function Coin() {
-  const [loading, setLoading] = useState(true);
   const { coinId } = useParams<RouteParams>();
   const { state } = useLocation<RouteState>();
-  const [info, setInfo] = useState<InfoData>();
-  const [priceInfo, setPriceInfo] = useState<PriceData>();
   const priceMatch = useRouteMatch("/:coinId/price");
   const chartMatch = useRouteMatch("/:coinId/chart");
+  const { isLoading: infoLoading, data: infoData } = useQuery<InfoData>(
+    ["info", coinId],
+    () => fetchCoinInfo(coinId)
+  );
+  const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>(
+    ["tickers", coinId],
+    () => fetchCoinTickers(coinId)
+  );
+  /*   const [loading, setLoading] = useState(true);
+  const [info, setInfo] = useState<InfoData>();
+  const [priceInfo, setPriceInfo] = useState<PriceData>();
   console.log(priceMatch);
   useEffect(() => {
     (async () => {
@@ -161,12 +170,13 @@ function Coin() {
       setPriceInfo(priceData);
       setLoading(false);
     })();
-  }, [coinId]);
+  }, [coinId]); */
+  const loading = infoLoading && tickersLoading;
   return (
     <Container>
       <Header>
         <Title>
-          {state?.name ? state.name : loading ? "Loading..." : info?.name}
+          {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
         </Title>
       </Header>
       {loading ? (
@@ -175,20 +185,20 @@ function Coin() {
         <>
           <CoinWrapper>
             <CoinInfo>RANK:</CoinInfo>
-            <CoinInfo>{priceInfo?.rank}</CoinInfo>
+            <CoinInfo>{tickersData?.rank}</CoinInfo>
             <CoinInfo>SYMBOL:</CoinInfo>
-            <CoinInfo>{priceInfo?.symbol}</CoinInfo>
+            <CoinInfo>{tickersData?.symbol}</CoinInfo>
             <CoinInfo>OPEN SOURCE:</CoinInfo>
-            <CoinInfo>{String(info?.open_source).toUpperCase()}</CoinInfo>
+            <CoinInfo>{String(infoData?.open_source).toUpperCase()}</CoinInfo>
           </CoinWrapper>
-          <CoinDesc>{info?.description}</CoinDesc>
+          <CoinDesc>{infoData?.description}</CoinDesc>
           <CoinWrapper>
             <CoinInfo>TOTAL SUPLY</CoinInfo>
-            <CoinInfo>{priceInfo?.total_supply}</CoinInfo>
+            <CoinInfo>{tickersData?.total_supply}</CoinInfo>
             <CoinInfo>MAX SUPPLY</CoinInfo>
-            <CoinInfo>{priceInfo?.max_supply}</CoinInfo>
+            <CoinInfo>{tickersData?.max_supply}</CoinInfo>
             <CoinInfo>PRICE</CoinInfo>
-            <CoinInfo>{priceInfo?.quotes.USD.ath_price?.toFixed(2)}</CoinInfo>
+            <CoinInfo>{tickersData?.quotes.USD.ath_price?.toFixed(2)}</CoinInfo>
           </CoinWrapper>
           <Taps>
             <Tap isActive={chartMatch !== null}>
