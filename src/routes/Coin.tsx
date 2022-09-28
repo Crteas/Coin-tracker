@@ -7,6 +7,7 @@ import {
   Link,
   useRouteMatch,
 } from "react-router-dom";
+import { Helmet } from "react-helmet";
 import styled from "styled-components";
 import { fetchCoinInfo, fetchCoinTickers } from "./api";
 import Chart from "./Chart";
@@ -151,29 +152,18 @@ function Coin() {
   );
   const { isLoading: tickersLoading, data: tickersData } = useQuery<PriceData>(
     ["tickers", coinId],
-    () => fetchCoinTickers(coinId)
+    () => fetchCoinTickers(coinId),
+    {
+      refetchInterval: 5000,
+    }
   );
-  /*   const [loading, setLoading] = useState(true);
-  const [info, setInfo] = useState<InfoData>();
-  const [priceInfo, setPriceInfo] = useState<PriceData>();
-  console.log(priceMatch);
-  useEffect(() => {
-    (async () => {
-      const infoData = await (
-        await fetch(`https://api.coinpaprika.com/v1/coins/${coinId}`)
-      ).json();
-      console.log(infoData);
-      const priceData = await (
-        await fetch(`https://api.coinpaprika.com/v1/tickers/${coinId}`)
-      ).json();
-      setInfo(infoData);
-      setPriceInfo(priceData);
-      setLoading(false);
-    })();
-  }, [coinId]); */
+
   const loading = infoLoading && tickersLoading;
   return (
     <Container>
+      <Helmet>
+        <title>Coin tracker</title>
+      </Helmet>
       <Header>
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}
@@ -202,10 +192,10 @@ function Coin() {
           </CoinWrapper>
           <Taps>
             <Tap isActive={chartMatch !== null}>
-              <Link to="chart">Chart</Link>
+              <Link to={`/${coinId}/chart`}>Chart</Link>
             </Tap>
             <Tap isActive={priceMatch !== null}>
-              <Link to="price">Price</Link>
+              <Link to={`/${coinId}/price`}>Price</Link>
             </Tap>
           </Taps>
 
@@ -214,7 +204,7 @@ function Coin() {
               <Price />
             </Route>
             <Route path={`/:coinId/chart`}>
-              <Chart />
+              <Chart coinId={coinId} />
             </Route>
           </Switch>
         </>
