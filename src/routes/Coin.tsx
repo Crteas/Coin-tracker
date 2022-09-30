@@ -48,6 +48,7 @@ const Tap = styled.span<{ isActive: boolean }>`
   background-color: #2b2f3a;
   border-radius: 8px;
   color: ${(props) => (props.isActive ? props.theme.accentColor : null)};
+  background-color: ${(props) => props.theme.tapColor};
   a {
     display: block;
     padding: 8px 0;
@@ -61,7 +62,7 @@ const CoinWrapper = styled.div`
   grid-template-rows: 1.2fr 1.8fr;
   height: 85px;
   width: 100%;
-  background-color: #2b2f3a;
+  background-color: ${(props) => props.theme.tapColor};
   border-radius: 10px;
   font-size: 18px;
 `;
