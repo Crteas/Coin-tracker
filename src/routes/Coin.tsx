@@ -20,6 +20,9 @@ const Container = styled.div`
   padding: 0px 10px;
   max-width: 480px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
 `;
 
 const Header = styled.header`
@@ -80,6 +83,17 @@ const CoinInfo = styled.div`
 const CoinDesc = styled.div`
   font-size: 18px;
   padding: 20px 2px;
+`;
+
+const BackBtn = styled.button`
+  border-radius: 20px;
+  border: none;
+  background-color: ${(prop) => prop.theme.tapColor};
+  color: ${(prop) => prop.theme.accentColor};
+  a {
+    display: block;
+    padding: 10px;
+  }
 `;
 
 interface RouteState {
@@ -165,6 +179,9 @@ function Coin() {
       <Helmet>
         <title>Coin tracker</title>
       </Helmet>
+      <BackBtn>
+        <Link to={"/"}>Back to list</Link>
+      </BackBtn>
       <Header>
         <Title>
           {state?.name ? state.name : loading ? "Loading..." : infoData?.name}

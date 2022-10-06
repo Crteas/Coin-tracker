@@ -24,24 +24,32 @@ function Chart({ coinId }: ChartProps) {
   const { isLoading, data } = useQuery<IHistory[]>(["chlcv", coinId], () =>
     fetchCoinHistory(coinId)
   );
+
+  const chartData = data?.map((item) => [
+    item.time_close,
+    [
+      Number(item.open),
+      Number(item.high),
+      Number(item.low),
+      Number(item.close),
+    ],
+  ]) as [];
+
   return (
     <h1>
       {isLoading ? (
         "LoadingChart.."
       ) : (
         <ApexChart
-          type="line"
+          type="candlestick"
           series={[
             {
-              name: "Hello",
-              data: data?.map((price) => Number(price.close)) ?? [],
+              data: chartData,
             },
           ]}
           options={{
             xaxis: {
-              categories: data?.map((date) =>
-                new Date(date.time_close).getMinutes()
-              ),
+              type: "datetime",
             },
             theme: {
               mode: isDark ? "dark" : "light",
